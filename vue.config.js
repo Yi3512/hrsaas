@@ -29,6 +29,11 @@ module.exports = {
       warnings: false,
       errors: true,
     },
+    proxy: {
+      '/api': {
+        target: 'http://ihrm-java.itheima.net/',
+      },
+    },
     // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
