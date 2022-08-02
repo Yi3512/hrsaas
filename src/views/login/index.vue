@@ -54,7 +54,7 @@ export default {
   name: 'Login',
   data() {
     return {
-      isloading: '',
+      isloading: false,
       // 输入框的定义数据
       loginForm: {
         mobile: '13800000002',
