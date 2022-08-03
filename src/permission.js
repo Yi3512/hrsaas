@@ -1,22 +1,41 @@
 import router from '@/router'
 import store from '@/store'
-// 白名单
+// 路由(全局)前置守卫
+// 路由(全局)后置守卫
+// 路由独享守卫
+// 组件内守卫
+// 会在所有路由进入之前触发
+// to: 去哪里的路由信息
+// from: 来自于哪个路由的信息
+// next: 是否进入
 const whiteList = ['/login', '/404']
-// 路由（全局）前置守卫
 router.beforeEach((to, from, next) => {
   const token = store.state.user.token
-  //   看有没有登录权限
   if (token) {
-    // 有
-    // 判断是否在登录页 是跳转至首页
-    if (to.path === '/login') return next('/')
-    // 不是 直接进入
-    next()
+    if (!store.state.user.userInfo.userId) {
+      // 获取用户信息
+      store.dispatch('user/getUserInfo')
+    }
+
+    // 1. 登录
+    // 是否进入登录页
+    if (to.path === '/login') {
+      // 1.1 是 跳到首页
+      next('/')
+    } else {
+      // 1.2 不是 直接进入
+      next()
+    }
   } else {
-    // 无登录权限
-    const isCloudes = whiteList.includes(to.path)
-    // 判断是否在白名单 在 直接进入
-    if (isCloudes) return next()        
-    next('/login')
+    // 2. 未登录
+    // 访问的是否在白名单(未登录也能访问的页面)
+    const isCludes = whiteList.includes(to.path)
+    if (isCludes) {
+      // 2.1 在白名单 放行
+      next()
+    } else {
+      // 2.2 不在白名单(不登录不能访问) 跳到登录页
+      next('/login')
+    }
   }
 })
