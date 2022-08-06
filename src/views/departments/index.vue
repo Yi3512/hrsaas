@@ -1,37 +1,79 @@
 <template>
-  <div class="dashboard-container">
+  <div v-loading="loading" class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-        <el-row type="flex">
-          <el-col>传智教育</el-col>
-          <el-col span="5"
-            >负责人
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                操作<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu trigger="click">
-                <el-dropdown-item>添加子部门</el-dropdown-item>
-                <el-dropdown-item>删除部门</el-dropdown-item>
-                <el-dropdown-item>编辑部门</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </el-col>
-        </el-row>
+        <!-- 头部 -->
+        <tree-tools @add="showAdd" :isRoot="true" :treeNode="compey" />
+        <el-tree :data="treeData" default-expand-all :props="defaultProps">
+          <template v-slot="{ data }">
+            <!--  -->
+            <tree-tools
+              @edit="showEdit"
+              @add="showAdd"
+              @remove="DeptsList"
+              :treeNode="data"
+            />
+          </template>
+        </el-tree>
       </el-card>
     </div>
+    <!-- 弹出层 -->
+    <add-dept
+      ref="AddDept"
+      @add-success="DeptsList"
+      :visible.sync="dialogVisible"
+      :AddDeptNode="AddDeptNode"
+    />
   </div>
 </template>
 
 <script>
+import { getDeptsApi } from '@/api/departments.js'
+import treeTools from '@/components/tree-tools.vue'
+import { transListToTree } from '@/utils'
+import AddDept from '@/components/addDept.vue'
 export default {
+  components: { treeTools, AddDept },
   data() {
-    return {}
+    return {
+      treeData: [
+        {
+          name: '总裁办',
+          children: [{ name: '董事会' }],
+        },
+        { name: '行政部' },
+        { name: '人事部' },
+      ],
+      defaultProps: {
+        label: 'name',
+      },
+      compey: { name: '传智教育', manager: '负责人' },
+      AddDeptNode: {},
+      dialogVisible: false,
+      loading: false,
+    }
   },
 
-  created() {},
+  created() {
+    this.DeptsList()
+  },
 
-  methods: {},
+  methods: {
+    async DeptsList() {
+      this.loading = true
+      const res = await getDeptsApi()
+      this.treeData = transListToTree(res.depts, '')
+      this.loading = false
+    },
+    showAdd(val) {
+      this.dialogVisible = true
+      this.AddDeptNode = val
+    },
+    showEdit(val) {
+      this.dialogVisible = true
+      this.$refs.AddDept.getDeptById(val.id)
+    },
+  },
 }
 </script>
 

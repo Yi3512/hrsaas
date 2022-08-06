@@ -17,10 +17,10 @@ import '@/icons' // icon
 import '@/permission' // permission control
 
 // mock假数据
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+// if (process.env.NODE_ENV === 'production') {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 
 // 注册element ui
 Vue.use(ElementUI, { locale })

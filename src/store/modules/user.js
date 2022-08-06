@@ -12,6 +12,7 @@ export default {
     },
     setUserInfo(state, payload) {
       state.userInfo = payload
+      console.log(state.userInfo, '登录信息')
     },
   },
   actions: {
